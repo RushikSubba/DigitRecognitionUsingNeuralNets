@@ -15,7 +15,7 @@ class Network(object):
     def feedforward(self, a):
         
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
+            a = sigmoid(np.dot(w, a) + b)
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
@@ -31,10 +31,12 @@ class Network(object):
         for j in range(epochs):
             random.shuffle(training_data)
             mini_batches = [
-                training_data[k:k+mini_batch_size]
+                training_data[k:k + mini_batch_size]
                 for k in range(0, n, mini_batch_size)]
+            
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
+            
             if test_data:
                 print("Epoch {} : {} / {}".format(j,self.evaluate(test_data),n_test))
             else:
@@ -44,6 +46,7 @@ class Network(object):
         
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
+
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
@@ -75,13 +78,14 @@ class Network(object):
         for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp
             nabla_b[-l] = delta
-            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+            nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
+
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
-        test_results = [(np.argmax(self.feedforward(x)), y)
+        test_results = [(np.argmax(self.feedforward(x)), np.argmax(y))
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
@@ -89,10 +93,10 @@ class Network(object):
         return (output_activations-y)
 
 def sigmoid(z):
-    return 1.0/(1.0+np.exp(-z))
+    return 1.0/(1.0 + np.exp(-z))
 
 def sigmoid_prime(z):
-    return sigmoid(z)*(1-sigmoid(z))
+    return sigmoid(z)*(1 - sigmoid(z))
 
 if __name__ == '__main__':
     tr, va, te = loader.load_data_wrapper()
